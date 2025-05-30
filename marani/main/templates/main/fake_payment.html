@@ -1,0 +1,15 @@
+<form method="POST" action="/fake-payment/">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Ваш email" required>
+    <input type="number" name="amount" placeholder="Сумма" min="1" required>
+    <button type="submit">Оплата</button>
+</form>
+
+<style>
+    .demo-warning {
+        color: #dc3545;
+        border: 2px solid;
+        padding: 15px;
+        margin: 20px 0;
+    }
+</style>

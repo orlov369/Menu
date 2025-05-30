@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Марани меню</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-overlay">
+            <h1 class="restaurant-title">Марани</h1>
+            <button id="cart-icon" class="cart-icon">
+                <i class="fas fa-shopping-basket"></i>
+                <span class="cart-counter" id="cart-counter">0</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="categories-section">
+            <div class="categories-grid">
+                {% for category in categories %}
+                <div class="category-card" data-category-id="{{ category.id }}">
+                    <div class="category-icon">
+                        <i class="{{ category.icon }}"></i>
+                    </div>
+                    <h3 class="category-name">{{ category.name }}</h3>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="dishes-section" id="dishes-container">
+            <div class="dishes-header">
+    </div>
+            <div class="dishes-grid" id="dishes-list"></div>
+        </section>
+    </main>
+
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Ваша корзина</h3>
+            <button class="close-cart" id="close-cart">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-content"></div>
+        <div class="cart-footer">
+            <div class="total-price">
+                <span>Итого:</span>
+                <span id="total-amount">0 ₽</span>
+            </div>
+            <!-- В секции корзины -->
+<button class="checkout-btn" id="checkout-btn">Оформить заказ</button>
+        </div>
+    </div>
+
+    <script src="{% static 'main/js/script.js' %}"></script>
+</body>
+</html>

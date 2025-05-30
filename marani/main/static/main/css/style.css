@@ -1,0 +1,469 @@
+:root {
+    --primary: #A68A64;
+    --secondary: #D4B996;
+    --bg: #FFF9F0;
+    --text: #4A3F35;
+    --accent: #E8D5C4;
+    --white: #FFFFFF;
+    --shadow: 0 4px 20px rgba(166, 138, 100, 0.1);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+}
+
+/* Шапка */
+.main-header {
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.header-overlay {
+    background: rgb(199, 159, 108);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.restaurant-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    color: var(--white);
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Категории */
+.categories-section {
+    padding: 2rem;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.category-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+}
+
+.category-icon {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.category-name {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--text);
+}
+
+/* Блюда */
+.dishes-section {
+    display: none;
+    padding: 2rem;
+}
+
+.dishes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 300px;
+}
+
+.dish-card {
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease;
+}
+
+.dish-card:hover {
+    transform: translateY(-3px);
+}
+
+.dish-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.dish-info {
+    padding: 1.5rem;
+}
+
+.dish-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    margin: 0 0 1rem;
+    color: var(--primary);
+}
+
+.dish-description {
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.dish-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dish-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.add-to-cart {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background: var(--secondary);
+}
+
+/* Корзина */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    background: var(--white);
+    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-sidebar.active {
+    right: 0;
+}
+
+.cart-header {
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 0;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--accent);
+}
+
+.cart-footer {
+    padding: 1.5rem;
+    border-top: 2px solid var(--accent);
+}
+
+.total-price {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background: var(--secondary);
+}
+
+/* Дополнительные стили */
+.cart-icon {
+    position: absolute;
+    right: 30px;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.cart-counter {
+    background: var(--secondary);
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 0.9rem;
+    margin-left: 5px;
+}
+
+.item-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-quantity, .btn-remove {
+    background: var(--accent);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-quantity:hover, .btn-remove:hover {
+    background: var(--secondary);
+}
+
+.loading, .empty, .error {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .restaurant-title {
+        font-size: 2.5rem;
+    }
+    
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dish-image {
+        height: 150px;
+    }
+}
+
+.category-card.loading {
+    opacity: 0.7;
+    pointer-events: none;
+    position: relative;
+}
+
+.category-card.loading::after {
+    content: "⌛";
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+/* Telegram адаптация */
+body {
+    padding-top: 0 !important;
+    background: var(--bg) !important;
+}
+
+.tg-main-button {
+    background: var(--primary) !important;
+}
+
+/* Оптимизация для мобил */
+@media (max-width: 480px) {
+    .dish-image {
+        height: 180px;
+    }
+    
+    .category-card {
+        padding: 1rem;
+    }
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.error {
+    color: #dc3545;
+    padding: 2rem;
+    text-align: center;
+}
+/* Добавьте в конец файла */
+.dishes-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0 1rem;
+}
+
+#back-to-categories {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+#back-to-categories:hover {
+     background: var(--primary);
+    color: var(--white);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    margin-right: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.item-price {
+    font-weight: bold;
+    color: var(--primary);
+    display: block;
+    margin: 5px 0;
+}
+
+/* Анимация добавления в корзину */
+@keyframes jump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.cart-icon.jump {
+    animation: jump 0.5s ease;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.form-actions button {
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.form-actions button[type="submit"] {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+}
+
+.form-actions button[type="submit"]:hover {
+    background: var(--secondary);
+}
+
+.form-actions button[type="button"] {
+    background: var(--accent);
+    border: none;
+}
