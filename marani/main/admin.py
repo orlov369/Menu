@@ -2,6 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils.html import format_html
 from .models import Category, Dish, Order
+from .models import Promotion
 
 class CategoryAdminForm(forms.ModelForm):
     class Meta:
@@ -24,9 +25,22 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Dish)
 class DishAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'spicy', 'image_preview')
-    list_filter = ('category', 'spicy')
+    list_display = ('name', 'category', 'price', 'weight', 'is_active')
+    list_filter = ('category', 'is_active')
     search_fields = ('name', 'description')
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('name', 'category', 'price', 'image', 'is_active')
+        }),
+        ('Описание', {
+            'fields': ('description',)
+        }),
+        ('Детали', {
+            'fields': ('weight', 'composition', 'calories', 
+                      'proteins', 'fats', 'carbohydrates'),
+            'classes': ('collapse',)  # Сворачиваемый блок
+        }),
+    )
     
     def image_preview(self, obj):
         if obj.image:
@@ -57,3 +71,10 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('is_paid', 'fake_payment_id', 'created_at')
         }),
     )
+
+@admin.register(Promotion)
+class PromotionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'is_active', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'description')
+    readonly_fields = ('created_at',)

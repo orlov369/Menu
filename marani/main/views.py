@@ -10,6 +10,9 @@ from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.conf import settings
 import uuid
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Promotion
 
 def validate_telegram_data(request):
     init_data = request.headers.get('X-Telegram-Init-Data', '')
@@ -75,6 +78,17 @@ def get_menu(request):
     categories = Category.objects.all().values('id', 'name', 'icon')
     return JsonResponse(list(categories), safe=False)
 
+@api_view(['GET'])
+def get_promotions(request):
+    promotions = Promotion.objects.filter(is_active=True).order_by('-created_at')
+    data = [{
+        'id': p.id,
+        'title': p.title,
+        'description': p.description,
+        'image_url': request.build_absolute_uri(p.image.url) if p.image else None
+    } for p in promotions]
+    return Response(data)
+
 @csrf_exempt
 def fake_payment(request):
     if request.method == 'POST':
@@ -123,3 +137,23 @@ def fake_payment(request):
                 'message': str(e)
             }, status=400)
     return JsonResponse({'status': 'error'}, status=405)
+
+def dish_detail(request, pk):
+    try:
+        dish = Dish.objects.get(pk=pk)
+        data = {
+            'id': dish.id,
+            'name': dish.name,
+            'description': dish.description,
+            'image': dish.image.url if dish.image else None,
+            'composition': dish.composition,
+            'weight': dish.weight,
+            'calories': dish.calories,
+            'proteins': dish.proteins,
+            'fats': dish.fats,
+            'carbohydrates': dish.carbohydrates
+        }
+        return JsonResponse(data)
+    except Dish.DoesNotExist:
+        return JsonResponse({'error': 'Dish not found'}, status=404)
+

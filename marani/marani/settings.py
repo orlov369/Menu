@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main.apps.MainConfig',  # Ваше приложение
+    'main.apps.MainConfig',
+    'rest_framework',  
     
 ]
 
@@ -89,10 +90,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'main/static/main'),  # Путь к папке static приложения
-]
+STATIC_URL = '/static/'
+
 
 TELEGRAM_BOT_TOKEN = '7267018854:AAHPvFZ2IfliD0GcBseCosY9fX0p1l7Z2yQ'
 TELEGRAM_WEBAPP_URL = 'https://localhost:8000/'  # Для разработки

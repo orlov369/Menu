@@ -13,6 +13,18 @@
 <body>
     <header class="main-header">
         <div class="header-overlay">
+            <!-- Кнопка доставки -->
+            <button id="delivery-button" class="delivery-button">
+                <i class="fas fa-truck"></i>
+                <span class="delivery-button-text">Доставка</span>
+            </button>
+
+            <!-- Кнопка акций -->
+            <button id="promo-button" class="promo-button">
+                <i class="fas fa-percentage"></i>
+                <span class="promo-button-text">Акции</span>
+            </button>
+            
             <h1 class="restaurant-title">Марани</h1>
             <button id="cart-icon" class="cart-icon">
                 <i class="fas fa-shopping-basket"></i>
@@ -23,7 +35,7 @@
 
     <main class="main-content">
         <section class="categories-section">
-            <div class="categories-grid">
+            <div class="categories-grid" id="categories-container">
                 {% for category in categories %}
                 <div class="category-card" data-category-id="{{ category.id }}">
                     <div class="category-icon">
@@ -37,11 +49,30 @@
 
         <section class="dishes-section" id="dishes-container">
             <div class="dishes-header">
-    </div>
-            <div class="dishes-grid" id="dishes-list"></div>
+                <button id="back-to-categories">&larr; Назад</button>
+                <h2 id="current-category-name"></h2>
+            </div>
+            <div class="dishes-grid" id="dishes-list">
+                <!-- Пример карточки блюда (будет заполняться через JS) -->
+                <div class="dish-card" style="display: none;">
+                    <img src="" class="dish-image" loading="lazy" alt="">
+                    <div class="dish-info">
+                        <h3 class="dish-title"></h3>
+                        <p class="dish-description"></p>
+                        <div class="dish-footer">
+                            <span class="dish-price"></span>
+                            <div class="dish-actions">
+                                <button class="details-btn" data-dish-id="">Подробнее</button>
+                                <button class="add-to-cart">Добавить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
+    <!-- Корзина -->
     <div class="cart-sidebar" id="cart-sidebar">
         <div class="cart-header">
             <h3>Ваша корзина</h3>
@@ -53,10 +84,100 @@
                 <span>Итого:</span>
                 <span id="total-amount">0 ₽</span>
             </div>
-            <!-- В секции корзины -->
-<button class="checkout-btn" id="checkout-btn">Оформить заказ</button>
+            <button class="checkout-btn" id="checkout-btn">Оформить заказ</button>
         </div>
     </div>
+
+    <!-- Модальное окно деталей блюда -->
+    <div id="dish-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="dish-details-content">
+                <h3 class="dish-details-title"></h3>
+                <img src="" class="dish-details-image" loading="lazy" alt="">
+                <div class="dish-details-description"></div>
+                <div class="dish-details-composition"></div>
+                <div class="nutrition-facts">
+                    <div class="nutrition-item weight">
+                        <div class="nutrition-value"></div>
+                        <div class="nutrition-label">Вес (г)</div>
+                    </div>
+                    <div class="nutrition-item calories">
+                        <div class="nutrition-value"></div>
+                        <div class="nutrition-label">Ккал</div>
+                    </div>
+                    <div class="nutrition-item proteins">
+                        <div class="nutrition-value"></div>
+                        <div class="nutrition-label">Белки (г)</div>
+                    </div>
+                    <div class="nutrition-item fats">
+                        <div class="nutrition-value"></div>
+                        <div class="nutrition-label">Жиры (г)</div>
+                    </div>
+                    <div class="nutrition-item carbohydrates">
+                        <div class="nutrition-value"></div>
+                        <div class="nutrition-label">Углеводы (г)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно акций -->
+    <div id="promo-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Наши акции</h2>
+            <div class="promo-list" id="promo-list">
+                <div class="loading">Загрузка акций...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно доставки -->
+    <div id="delivery-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Условия доставки</h2>
+            <div class="delivery-info">
+                <h3>Доставка по Кургану</h3>
+                <ul>
+                    <li>🚚 Минимальный заказ: 1000 руб.</li>
+                    <li>⏱ Доставка осуществляется только в пределах города в течение 60 минут.</li>
+                    <li>💰 При оформлении заказа на сумму до 990 рублей доставка по Кургану - 140 рублей.</li>
+                    <li>⌚ Часы работы: ежедневно с 12:00 до 21:30</li>
+                </ul>
+                
+                <h3>Самовывоз</h3>
+                <p>🏠 Адрес: г.Курган ул.Коли Мяготина 62а</p>
+                <p>⏱ Время приготовления: 30-45 минут</p>
+            </div>
+        </div>
+    </div>
+
+    <footer id="app-footer" class="app-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p><i class="fas fa-map-marker-alt"></i> г.Курган ул.Коли Мяготина 62а</p>
+                <p><i class="fas fa-phone"></i> <a href="tel:+79991234567">+7 (999) 123-45-67</a></p>
+            </div>
+            <div class="footer-section">
+                <h4>Мы в соцсетях</h4>
+                <div class="social-links">
+                    <a href="https://vk.com/marani_restaurant" target="_blank" class="social-link vk">
+                        <i class="fab fa-vk"></i> ВКонтакте
+                    </a>
+                    <a href="https://facebook.com/marani_restaurant" target="_blank" class="social-link fb">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© {% now "Y" %} Марани. Все права защищены</p>
+        </div>
+    </footer>
 
     <script src="{% static 'main/js/script.js' %}"></script>
 </body>
