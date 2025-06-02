@@ -483,6 +483,8 @@ body {
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
+    text-align: center;
+    justify-items: center;
 }
 
 .footer-section h4 {
@@ -490,6 +492,7 @@ body {
     font-size: 1.3rem;
     margin-bottom: 1rem;
     color: var(--accent);
+    text-align: center;
 }
 
 .footer-section p, .footer-section a {
@@ -499,6 +502,8 @@ body {
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
+     justify-content: center;
+      text-align: center;
 }
 
 .footer-section a:hover {
@@ -747,17 +752,17 @@ body {
     gap: 10px;
 }
 
-.details-button {
-    background: var(--accent);
-    color: var(--text);
+.details-btn {
+    background: var(--primary);
+    color: var(--white);
     border: none;
-    padding: 0.6rem 1rem;
+     padding: 0.8rem 1.5rem;
     border-radius: 25px;
     cursor: pointer;
     transition: background 0.3s;
 }
 
-.details-button:hover {
+.details-btn:hover {
     background: var(--secondary);
 }
 

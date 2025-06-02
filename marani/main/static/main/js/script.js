@@ -13,34 +13,25 @@ document.addEventListener('DOMContentLoaded', () => {
         dishesContainer: getElement('#dishes-container'),
         dishesList: getElement('#dishes-list'),
         cartSidebar: getElement('#cart-sidebar'),
-
-        dishDetailsModal: document.getElementById('dish-details-modal'),
-        dishDetailsContainer: document.getElementById('dish-details-container'),
-        closeDetails: document.querySelector('.close-details'),
-        
-        deliveryButton: document.getElementById('delivery-button'),
-        deliveryModal: document.getElementById('delivery-modal'),
-        closeDelivery: document.querySelector('.close-delivery'),
-
-        // Элементы корзины
+        dishDetailsModal: getElement('#dish-details-modal'),
+        dishDetailsContent: getElement('#dish-details-content'),
         cartContent: getElement('#cart-content'),
         cartCounter: getElement('#cart-counter'),
         totalAmount: getElement('#total-amount'),
         checkoutBtn: getElement('#checkout-btn'),
-        
-        // Кнопки и триггеры
         cartIcon: getElement('#cart-icon'),
         closeCart: getElement('#close-cart'),
         backToCategories: getElement('#back-to-categories'),
-        
-        // Информационные элементы
         currentCategoryName: getElement('#current-category-name'),
         appFooter: getElement('#app-footer'),
-
+        deliveryButton: getElement('#delivery-button'),
+        deliveryModal: getElement('#delivery-modal'),
+        closeDelivery: getElement('.close-modal', getElement('#delivery-modal')),
         promoButton: getElement('#promo-button'),
         promoModal: getElement('#promo-modal'),
         promoList: getElement('#promo-list'),
-        closePromo: getElement('.close-promo')
+        closePromo: getElement('.close-modal', getElement('#promo-modal')),
+        closeDetails: getElement('.close-modal', getElement('#dish-details-modal'))
     };
 
     // Состояние приложения
@@ -60,17 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             localStorage.setItem('cart', JSON.stringify(cart));
             
-            // Обновление счетчика
             if (elements.cartCounter) {
                 elements.cartCounter.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
             }
             
-            // Обновление общей суммы
             if (elements.totalAmount) {
                 elements.totalAmount.textContent = `${calculateTotal().toFixed(2)} ₽`;
             }
             
-            // Отрисовка элементов корзины
             if (elements.cartContent) {
                 elements.cartContent.innerHTML = cart.map(item => `
                     <div class="cart-item">
@@ -112,13 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             currentCategory = categoryId;
 
-            // Проверка кэша
             if (dishesCache[categoryId]) {
                 renderDishes(dishesCache[categoryId]);
                 return;
             }
 
-            // Запрос данных
             const response = await fetch(`/api/dishes/?category_id=${categoryId}`);
             if (!response.ok) throw new Error(`Ошибка ${response.status}`);
             
@@ -142,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Отрисовка блюд
+    // Отрисовка блюд (с кнопкой "Подробнее")
     const renderDishes = (dishes) => {
         if (!elements.dishesList) return;
         
@@ -156,284 +142,126 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${dish.description ? `<p>${dish.description}</p>` : ''}
                     <div class="dish-footer">
                         <span>${dish.price} ₽</span>
-                        <button class="add-to-cart" data-dish='${JSON.stringify(dish)}'>
-                            Добавить
-                        </button>
+                        <div class="dish-actions">
+                            <button class="details-btn" data-dish-id="${dish.id}">Подробнее</button>
+                            <button class="add-to-cart" data-dish='${JSON.stringify(dish)}'>
+                                Добавить
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         `).join('');
     };
 
-    // Обработчики событий
-    const setupEventListeners = () => {
-        // Категории
-        if (elements.categoriesContainer) {
-            elements.categoriesContainer.addEventListener('click', (e) => {
-                const card = e.target.closest('.category-card');
-                if (card) {
-                    const categoryId = card.dataset.categoryId;
-                    const categoryName = getElement('.category-name', card)?.textContent;
-                    if (categoryId && categoryName) {
-                        loadCategoryDishes(categoryId, categoryName);
-                    }
-                }
-            });
-
-
-    document.body.addEventListener('click', (e) => {
-        if (e.target.classList.contains('details-button')) {
-            const dishId = e.target.dataset.dishId;
-            loadDishDetails(dishId);
-        }
-    });
-    
-    // Закрытие модального окна деталей
-    if (elements.closeDetails) {
-        elements.closeDetails.addEventListener('click', () => {
-            elements.dishDetailsModal.style.display = 'none';
-        });
-    }
-    
-    // Закрытие по клику вне окна
-    if (elements.dishDetailsModal) {
-        elements.dishDetailsModal.addEventListener('click', (e) => {
-            if (e.target === elements.dishDetailsModal) {
-                elements.dishDetailsModal.style.display = 'none';
-            }
-        });
-    }
-
-    // Обработчик кнопки доставки
-    if (elements.deliveryButton && elements.deliveryModal) {
-        elements.deliveryButton.addEventListener('click', () => {
-            elements.deliveryModal.style.display = 'flex';
-        });
-    }
-    
-    // Закрытие модального окна доставки
-    if (elements.closeDelivery) {
-        elements.closeDelivery.addEventListener('click', () => {
-            elements.deliveryModal.style.display = 'none';
-        });
-    }
-    
-    // Закрытие по клику вне окна
-    if (elements.deliveryModal) {
-        elements.deliveryModal.addEventListener('click', (e) => {
-            if (e.target === elements.deliveryModal) {
-                elements.deliveryModal.style.display = 'none';
-            }
-        });
-    }
-
-        // Акции
-    if (elements.promoButton && elements.promoModal) {
-        elements.promoButton.addEventListener('click', () => {
-            elements.promoModal.style.display = 'flex';
-            loadPromotions();
-        });
-    }
-    
-    if (elements.closePromo && elements.promoModal) {
-        elements.closePromo.addEventListener('click', () => {
-            elements.promoModal.style.display = 'none';
-        });
-    }
-    
-    // Закрытие по клику вне окна
-    if (elements.promoModal) {
-        elements.promoModal.addEventListener('click', (e) => {
-            if (e.target === elements.promoModal) {
-                elements.promoModal.style.display = 'none';
-            }
-        });
-    }
-        }
-
-        // Назад к категориям
-        if (elements.backToCategories) {
-            elements.backToCategories.addEventListener('click', () => {
-                if (elements.dishesContainer) {
-                    elements.dishesContainer.style.display = 'none';
-                }
-            });
-        }
-
-const loadDishDetails = async (dishId) => {
-    try {
-        const response = await fetch(`/api/dishes/${dishId}/`);
-        if (!response.ok) throw new Error('Ошибка загрузки');
-        
-        const dish = await response.json();
-        renderDishDetails(dish);
-        
-        if (elements.dishDetailsModal) {
-            elements.dishDetailsModal.style.display = 'flex';
-        }
-    } catch (error) {
-        console.error('Error loading dish details:', error);
-    }
-};
-
-    document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('details-btn')) {
-        const dishId = e.target.getAttribute('data-dish-id');
-        loadDishDetails(dishId);
-    }
-    
-    if (e.target.classList.contains('close-modal')) {
-        document.getElementById('dish-details-modal').style.display = 'none';
-    }
-});
-
-// Функция отрисовки деталей блюда
-const renderDishDetails = (dish) => {
-    if (!elements.dishDetailsContainer) return;
-    
-    elements.dishDetailsContainer.innerHTML = `
-        <h3>${dish.name}</h3>
-        ${dish.image ? `<img src="${dish.image}" class="dish-image-modal">` : ''}
-        
-        <div class="dish-details-section">
-            <h4>Описание</h4>
-            <p>${dish.description || 'Нет описания'}</p>
-        </div>
-        
-        ${dish.composition ? `
-        <div class="dish-details-section">
-            <h4>Состав</h4>
-            <p>${dish.composition}</p>
-        </div>` : ''}
-        
-        <div class="nutrition-facts">
-            ${dish.weight ? `
-            <div class="nutrition-item">
-                <div class="nutrition-value">${dish.weight}</div>
-                <div class="nutrition-label">Вес (г)</div>
-            </div>` : ''}
+    // Загрузка деталей блюда
+    const loadDishDetails = async (dishId) => {
+        try {
+            const response = await fetch(`/api/dishes/${dishId}/`);
+            if (!response.ok) throw new Error('Ошибка загрузки');
             
-            ${dish.calories ? `
-            <div class="nutrition-item">
-                <div class="nutrition-value">${dish.calories}</div>
-                <div class="nutrition-label">Ккал</div>
-            </div>` : ''}
+            const dish = await response.json();
+            renderDishDetails(dish);
             
-            ${dish.proteins ? `
-            <div class="nutrition-item">
-                <div class="nutrition-value">${dish.proteins}</div>
-                <div class="nutrition-label">Белки </div>
-            </div>` : ''}
-            
-            ${dish.fats ? `
-            <div class="nutrition-item">
-                <div class="nutrition-value">${dish.fats}</div>
-                <div class="nutrition-label">Жиры </div>
-            </div>` : ''}
-            
-            ${dish.carbohydrates ? `
-            <div class="nutrition-item">
-                <div class="nutrition-value">${dish.carbohydrates}</div>
-                <div class="nutrition-label">Углеводы </div>
-            </div>` : ''}
-        </div>
-    `;
-};
-
-
-
-const loadPromotions = async () => {
-    if (!elements.promoList) return;
-    
-    try {
-        elements.promoList.innerHTML = '<div class="loading">Загрузка акций...</div>';
-        
-        const response = await fetch('/api/promotions/');
-        if (!response.ok) throw new Error('Ошибка загрузки');
-        
-        const promotions = await response.json();
-        renderPromotions(promotions);
-    } catch (error) {
-        console.error('Error loading promotions:', error);
-        if (elements.promoList) {
-            elements.promoList.innerHTML = '<div class="error">Не удалось загрузить акции</div>';
-        }
-    }
-};
-
-// Отрисовка акций
-const renderPromotions = (promotions) => {
-    if (!elements.promoList) return;
-    
-    elements.promoList.innerHTML = promotions.map(promo => `
-        <div class="promo-item">
-            ${promo.image_url ? `
-                <img src="${promo.image_url}" class="promo-image" loading="lazy" alt="${promo.title}">
-            ` : ''}
-            <div class="promo-info">
-                <h3 class="promo-title">${promo.title}</h3>
-                ${promo.description ? `<p>${promo.description}</p>` : ''}
-            </div>
-        </div>
-    `).join('');
-};
-
-        // Глобальные обработчики
-        document.body.addEventListener('click', (e) => {
-            // Добавление в корзину
-            if (e.target.classList.contains('add-to-cart') && e.target.dataset.dish) {
-                try {
-                    const dish = JSON.parse(e.target.dataset.dish);
-                    const existing = cart.find(item => item.id === dish.id);
-                    existing ? existing.quantity++ : cart.push({...dish, quantity: 1});
-                    updateCart();
-                    
-                    // Анимация иконки корзины
-                    if (elements.cartIcon) {
-                        elements.cartIcon.classList.add('jump');
-                        setTimeout(() => elements.cartIcon.classList.remove('jump'), 500);
-                    }
-                } catch (error) {
-                    console.error('Add to cart error:', error);
-                }
+            if (elements.dishDetailsModal) {
+                elements.dishDetailsModal.style.display = 'flex';
             }
-
-            // Управление количеством
-            if (e.target.classList.contains('btn-quantity') && e.target.dataset.id) {
-                const item = cart.find(i => i.id == e.target.dataset.id);
-                if (item) {
-                    const action = e.target.dataset.action;
-                    if (action === 'increase') item.quantity++;
-                    if (action === 'decrease') item.quantity = Math.max(1, item.quantity - 1);
-                    updateCart();
-                }
-            }
-
-            // Удаление товара
-            if (e.target.classList.contains('btn-remove') && e.target.dataset.id) {
-                cart = cart.filter(item => item.id != e.target.dataset.id);
-                updateCart();
-            }
-        });
-
-        // Корзина
-        if (elements.cartIcon && elements.cartSidebar) {
-            elements.cartIcon.addEventListener('click', () => 
-                elements.cartSidebar.classList.add('active'));
-        }
-        
-        if (elements.closeCart && elements.cartSidebar) {
-            elements.closeCart.addEventListener('click', () => 
-                elements.cartSidebar.classList.remove('active'));
-        }
-
-        // Оформление заказа
-        if (elements.checkoutBtn) {
-            elements.checkoutBtn.addEventListener('click', handleCheckout);
+        } catch (error) {
+            console.error('Error loading dish details:', error);
         }
     };
 
-    // Оформление заказа
+    // Отрисовка деталей блюда
+    const renderDishDetails = (dish) => {
+        if (!elements.dishDetailsContent) return;
+        
+        elements.dishDetailsContent.innerHTML = `
+            <h3 class="dish-details-title">${dish.name}</h3>
+            ${dish.image_url ? `<img src="${dish.image_url}" class="dish-details-image">` : ''}
+            
+            <div class="dish-details-section">
+                <h4>Описание</h4>
+                <p>${dish.description || 'Нет описания'}</p>
+            </div>
+            
+            ${dish.composition ? `
+            <div class="dish-details-section">
+                <h4>Состав</h4>
+                <p>${dish.composition}</p>
+            </div>` : ''}
+            
+            <div class="nutrition-facts">
+                ${dish.weight ? `
+                <div class="nutrition-item weight">
+                    <div class="nutrition-value">${dish.weight}</div>
+                    <div class="nutrition-label">Вес (г)</div>
+                </div>` : ''}
+                
+                ${dish.calories ? `
+                <div class="nutrition-item calories">
+                    <div class="nutrition-value">${dish.calories}</div>
+                    <div class="nutrition-label">Ккал</div>
+                </div>` : ''}
+                
+                ${dish.proteins ? `
+                <div class="nutrition-item proteins">
+                    <div class="nutrition-value">${dish.proteins}</div>
+                    <div class="nutrition-label">Белки (г)</div>
+                </div>` : ''}
+                
+                ${dish.fats ? `
+                <div class="nutrition-item fats">
+                    <div class="nutrition-value">${dish.fats}</div>
+                    <div class="nutrition-label">Жиры (г)</div>
+                </div>` : ''}
+                
+                ${dish.carbohydrates ? `
+                <div class="nutrition-item carbohydrates">
+                    <div class="nutrition-value">${dish.carbohydrates}</div>
+                    <div class="nutrition-label">Углеводы (г)</div>
+                </div>` : ''}
+            </div>
+        `;
+    };
+
+    // Загрузка акций
+    const loadPromotions = async () => {
+        if (!elements.promoList) return;
+        
+        try {
+            elements.promoList.innerHTML = '<div class="loading">Загрузка акций...</div>';
+            
+            const response = await fetch('/api/promotions/');
+            if (!response.ok) throw new Error('Ошибка загрузки');
+            
+            const promotions = await response.json();
+            renderPromotions(promotions);
+        } catch (error) {
+            console.error('Error loading promotions:', error);
+            if (elements.promoList) {
+                elements.promoList.innerHTML = '<div class="error">Не удалось загрузить акции</div>';
+            }
+        }
+    };
+
+    // Отрисовка акций
+    const renderPromotions = (promotions) => {
+        if (!elements.promoList) return;
+        
+        elements.promoList.innerHTML = promotions.map(promo => `
+            <div class="promo-item">
+                ${promo.image_url ? `
+                    <img src="${promo.image_url}" class="promo-image" loading="lazy" alt="${promo.title}">
+                ` : ''}
+                <div class="promo-info">
+                    <h3 class="promo-title">${promo.title}</h3>
+                    ${promo.description ? `<p>${promo.description}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+    };
+
+    // Обработка оформления заказа
     const handleCheckout = async () => {
         if (cart.length === 0) {
             alert('🛒 Корзина пуста!');
@@ -442,7 +270,7 @@ const renderPromotions = (promotions) => {
 
         try {
             if (window.Telegram?.WebApp?.version) {
-                tg.sendData(JSON.stringify({
+                Telegram.WebApp.sendData(JSON.stringify({
                     items: cart,
                     total: calculateTotal()
                 }));
@@ -483,11 +311,154 @@ const renderPromotions = (promotions) => {
         }
     };
 
-    // Вспомогательные функции
+    // Получение cookie
     const getCookie = (name) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
+    };
+
+    // Настройка обработчиков событий
+    const setupEventListeners = () => {
+        // Категории
+        if (elements.categoriesContainer) {
+            elements.categoriesContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.category-card');
+                if (card) {
+                    const categoryId = card.dataset.categoryId;
+                    const categoryName = getElement('.category-name', card)?.textContent;
+                    if (categoryId && categoryName) {
+                        loadCategoryDishes(categoryId, categoryName);
+                    }
+                }
+            });
+        }
+
+        // Назад к категориям
+        if (elements.backToCategories) {
+            elements.backToCategories.addEventListener('click', () => {
+                if (elements.dishesContainer) {
+                    elements.dishesContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // Корзина
+        if (elements.cartIcon && elements.cartSidebar) {
+            elements.cartIcon.addEventListener('click', () => 
+                elements.cartSidebar.classList.add('active'));
+        }
+        
+        if (elements.closeCart && elements.cartSidebar) {
+            elements.closeCart.addEventListener('click', () => 
+                elements.cartSidebar.classList.remove('active'));
+        }
+
+        // Доставка
+        if (elements.deliveryButton && elements.deliveryModal) {
+            elements.deliveryButton.addEventListener('click', () => {
+                elements.deliveryModal.style.display = 'flex';
+            });
+        }
+        
+        if (elements.closeDelivery && elements.deliveryModal) {
+            elements.closeDelivery.addEventListener('click', () => {
+                elements.deliveryModal.style.display = 'none';
+            });
+        }
+        
+        if (elements.deliveryModal) {
+            elements.deliveryModal.addEventListener('click', (e) => {
+                if (e.target === elements.deliveryModal) {
+                    elements.deliveryModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Акции
+        if (elements.promoButton && elements.promoModal) {
+            elements.promoButton.addEventListener('click', () => {
+                elements.promoModal.style.display = 'flex';
+                loadPromotions();
+            });
+        }
+        
+        if (elements.closePromo && elements.promoModal) {
+            elements.closePromo.addEventListener('click', () => {
+                elements.promoModal.style.display = 'none';
+            });
+        }
+        
+        if (elements.promoModal) {
+            elements.promoModal.addEventListener('click', (e) => {
+                if (e.target === elements.promoModal) {
+                    elements.promoModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Детали блюда
+        if (elements.closeDetails && elements.dishDetailsModal) {
+            elements.closeDetails.addEventListener('click', () => {
+                elements.dishDetailsModal.style.display = 'none';
+            });
+        }
+        
+        if (elements.dishDetailsModal) {
+            elements.dishDetailsModal.addEventListener('click', (e) => {
+                if (e.target === elements.dishDetailsModal) {
+                    elements.dishDetailsModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Глобальные обработчики
+        document.addEventListener('click', (e) => {
+            // Добавление в корзину
+            if (e.target.classList.contains('add-to-cart') && e.target.dataset.dish) {
+                try {
+                    const dish = JSON.parse(e.target.dataset.dish);
+                    const existing = cart.find(item => item.id === dish.id);
+                    existing ? existing.quantity++ : cart.push({...dish, quantity: 1});
+                    updateCart();
+                    
+                    if (elements.cartIcon) {
+                        elements.cartIcon.classList.add('jump');
+                        setTimeout(() => elements.cartIcon.classList.remove('jump'), 500);
+                    }
+                } catch (error) {
+                    console.error('Add to cart error:', error);
+                }
+            }
+
+            // Кнопка "Подробнее"
+            if (e.target.classList.contains('details-btn')) {
+                const dishId = e.target.dataset.dishId;
+                if (dishId) loadDishDetails(dishId);
+            }
+
+            // Управление количеством
+            if (e.target.classList.contains('btn-quantity') && e.target.dataset.id) {
+                const item = cart.find(i => i.id == e.target.dataset.id);
+                if (item) {
+                    const action = e.target.dataset.action;
+                    if (action === 'increase') item.quantity++;
+                    if (action === 'decrease') item.quantity = Math.max(1, item.quantity - 1);
+                    updateCart();
+                }
+            }
+
+            // Удаление товара
+            if (e.target.classList.contains('btn-remove') && e.target.dataset.id) {
+                cart = cart.filter(item => item.id != e.target.dataset.id);
+                updateCart();
+            }
+        });
+
+        // Оформление заказа
+        if (elements.checkoutBtn) {
+            elements.checkoutBtn.addEventListener('click', handleCheckout);
+        }
     };
 
     // Инициализация приложения
