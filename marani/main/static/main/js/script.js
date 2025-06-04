@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     // Безопасное получение элементов
     const getElement = (selector, parent = document) => {
         const el = parent.querySelector(selector);
@@ -8,13 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Основные элементы
     const elements = {
-        // Основные контейнеры
         categoriesContainer: getElement('#categories-container'),
         dishesContainer: getElement('#dishes-container'),
         dishesList: getElement('#dishes-list'),
         cartSidebar: getElement('#cart-sidebar'),
-        dishDetailsModal: getElement('#dish-details-modal'),
-        dishDetailsContent: getElement('#dish-details-content'),
         cartContent: getElement('#cart-content'),
         cartCounter: getElement('#cart-counter'),
         totalAmount: getElement('#total-amount'),
@@ -31,7 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
         promoModal: getElement('#promo-modal'),
         promoList: getElement('#promo-list'),
         closePromo: getElement('.close-modal', getElement('#promo-modal')),
-        closeDetails: getElement('.close-modal', getElement('#dish-details-modal'))
+        closeDetails: getElement('.close-modal', getElement('#dish-details-modal')),
+        dishDetailsModal: getElement('#dish-details-modal'),
+        dishDetailsContent: getElement('#dish-details-content'),
+        checkoutModal: getElement('#checkout-modal'),
+        orderSuccessModal: getElement('#order-success-modal'),
+        restaurantTitle: getElement('.restaurant-title'),
+        cancelBtn: getElement('.cancel-btn')
     };
 
     // Состояние приложения
@@ -73,9 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="btn-remove" data-id="${item.id}">×</button>
                         </div>
                     </div>
-                `).join('');
+                `).join('') || '<div class="empty">Корзина пуста</div>';
             }
-
         } catch (error) {
             console.error('Cart update error:', error);
         }
@@ -224,92 +226,201 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     };
 
-    // Загрузка акций
-    const loadPromotions = async () => {
-        if (!elements.promoList) return;
+     // Загрузка акций
+const loadPromotions = async () => {
+    if (!elements.promoList) return;
+    
+    try {
+        // Показываем индикатор загрузки
+        elements.promoList.innerHTML = '<div class="loading">Загрузка акций...</div>';
         
-        try {
-            elements.promoList.innerHTML = '<div class="loading">Загрузка акций...</div>';
+        // Добавляем небольшую задержку для демонстрации (можно убрать в продакшене)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const response = await fetch('/api/promotions/');
+        if (!response.ok) throw new Error(`Ошибка ${response.status}`);
+        
+        const promotions = await response.json();
+        
+        if (promotions.length === 0) {
+            elements.promoList.innerHTML = '<div class="empty">Сейчас нет активных акций</div>';
+            return;
+        }
+        
+        renderPromotions(promotions);
+    } catch (error) {
+        console.error('Error loading promotions:', error);
+        if (elements.promoList) {
+            elements.promoList.innerHTML = `
+                <div class="error">
+                    ❌ Не удалось загрузить акции<br>
+                    <button class="retry-btn">Повторить попытку</button>
+                </div>
+            `;
             
-            const response = await fetch('/api/promotions/');
-            if (!response.ok) throw new Error('Ошибка загрузки');
-            
-            const promotions = await response.json();
-            renderPromotions(promotions);
-        } catch (error) {
-            console.error('Error loading promotions:', error);
-            if (elements.promoList) {
-                elements.promoList.innerHTML = '<div class="error">Не удалось загрузить акции</div>';
+            // Добавляем обработчик для кнопки повтора
+            const retryBtn = elements.promoList.querySelector('.retry-btn');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', loadPromotions);
             }
         }
-    };
+    }
+};
 
-    // Отрисовка акций
-    const renderPromotions = (promotions) => {
-        if (!elements.promoList) return;
-        
-        elements.promoList.innerHTML = promotions.map(promo => `
-            <div class="promo-item">
-                ${promo.image_url ? `
-                    <img src="${promo.image_url}" class="promo-image" loading="lazy" alt="${promo.title}">
+// Отрисовка акций
+const renderPromotions = (promotions) => {
+    if (!elements.promoList) return;
+    
+    elements.promoList.innerHTML = promotions.map(promo => `
+        <div class="promo-item">
+            ${promo.image_url ? `
+                <img src="${promo.image_url}" class="promo-image" loading="lazy" alt="${promo.title}">
+            ` : ''}
+            <div class="promo-info">
+                <h3 class="promo-title">${promo.title}</h3>
+                ${promo.description ? `<p class="promo-description">${promo.description}</p>` : ''}
+                ${promo.created_at ? `
+                    <div class="promo-date">Добавлено: ${new Date(promo.created_at).toLocaleDateString()}</div>
                 ` : ''}
-                <div class="promo-info">
-                    <h3 class="promo-title">${promo.title}</h3>
-                    ${promo.description ? `<p>${promo.description}</p>` : ''}
-                </div>
             </div>
-        `).join('');
-    };
+        </div>
+    `).join('');
+};
 
-    // Обработка оформления заказа
-    const handleCheckout = async () => {
+
+    // Функция оформления заказа
+    const handleCheckout = () => {
         if (cart.length === 0) {
             alert('🛒 Корзина пуста!');
             return;
         }
 
-        try {
-            if (window.Telegram?.WebApp?.version) {
-                Telegram.WebApp.sendData(JSON.stringify({
-                    items: cart,
-                    total: calculateTotal()
-                }));
-                return;
+        if (elements.checkoutModal) {
+            elements.checkoutModal.style.display = 'flex';
+            
+            // Устанавливаем шрифт как у заголовка "Марани"
+            const modalTitle = elements.checkoutModal.querySelector('h3');
+            if (modalTitle && elements.restaurantTitle) {
+                modalTitle.style.fontFamily = getComputedStyle(elements.restaurantTitle).fontFamily;
             }
-
-            const email = prompt('Введите email для получения чека:');
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                alert('📧 Некорректный email!');
-                return;
-            }
-
-            const response = await fetch('/fake-payment/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') || ''
-                },
-                body: JSON.stringify({
-                    email,
-                    total: calculateTotal(),
-                    items: cart
-                })
-            });
-
-            const result = await response.json();
-            if (result.status === 'success') {
-                cart = [];
-                updateCart();
-                if (elements.cartSidebar) elements.cartSidebar.classList.remove('active');
-                alert('✅ Заказ успешно оформлен! Чек отправлен на email');
-            } else {
-                throw new Error(result.message || 'Ошибка сервера');
-            }
-        } catch (error) {
-            alert(`❌ Ошибка: ${error.message}`);
-            console.error('Checkout error:', error);
         }
     };
+
+    // Обработчик формы оформления заказа
+    const handleOrderSubmit = (e) => {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = {
+            customer_name: form.customer_name.value.trim(),
+            phone: form.phone.value,
+            address: form.address.value.trim(),
+            payment_method: form.querySelector('input[name="payment_method"]:checked').value
+        };
+        
+        // Валидация
+        if (!formData.customer_name) {
+            alert('Пожалуйста, укажите ваше имя');
+            return;
+        }
+        
+        if (!validatePhone(formData.phone)) {
+            alert('Пожалуйста, укажите корректный номер телефона');
+            return;
+        }
+        
+        if (!formData.address) {
+            alert('Пожалуйста, укажите адрес доставки');
+            return;
+        }
+        
+        // Закрываем модальное окно формы
+        if (elements.checkoutModal) {
+            elements.checkoutModal.style.display = 'none';
+        }
+        
+        // Очищаем корзину
+        cart = [];
+        updateCart();
+        
+        // Закрываем сайдбар корзины
+        if (elements.cartSidebar) {
+            elements.cartSidebar.classList.remove('active');
+        }
+        
+        // Показываем уведомление об успехе
+        if (elements.orderSuccessModal) {
+            elements.orderSuccessModal.style.display = 'flex';
+        }
+        
+        // Выводим данные заказа в консоль
+        console.log('Заказ оформлен:', {
+            ...formData,
+            items: cart,
+            total: calculateTotal()
+        });
+    };
+
+    // Обработчик кнопки "Отмена"
+    const handleCancelOrder = () => {
+        if (elements.checkoutModal) {
+            elements.checkoutModal.style.display = 'none';
+        }
+    };
+
+    // Функция для форматирования телефона
+    function formatPhoneNumber(phone) {
+        const cleaned = ('' + phone).replace(/\D/g, '');
+        const isRussianNumber = cleaned.length === 11 && cleaned[0] === '8' || 
+                              cleaned.length === 11 && cleaned[0] === '7' ||
+                              cleaned.length === 10;
+        
+        if (!isRussianNumber) {
+            return phone;
+        }
+        
+        const match = cleaned.match(/^(\d|7|8)?(\d{3})(\d{3})(\d{2})(\d{2})$/);
+        if (match) {
+            return '+7 (' + match[2] + ') ' + match[3] + '-' + match[4] + '-' + match[5];
+        }
+        return phone;
+    }
+
+    // Инициализация маски телефона
+    function initPhoneMask() {
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                const input = e.target;
+                const cleaned = input.value.replace(/\D/g, '');
+                let formatted = '';
+                
+                if (cleaned.length > 0) {
+                    formatted = '+7 (';
+                    if (cleaned.length > 1) {
+                        formatted += cleaned.substring(1, 4);
+                    }
+                    if (cleaned.length > 4) {
+                        formatted += ') ' + cleaned.substring(4, 7);
+                    }
+                    if (cleaned.length > 7) {
+                        formatted += '-' + cleaned.substring(7, 9);
+                    }
+                    if (cleaned.length > 9) {
+                        formatted += '-' + cleaned.substring(9, 11);
+                    }
+                }
+                
+                input.value = formatted;
+            });
+        }
+    }
+
+    // Функция валидации телефона
+    function validatePhone(phone) {
+        const cleaned = phone.replace(/\D/g, '');
+        return cleaned.length === 11;
+    }
 
     // Получение cookie
     const getCookie = (name) => {
@@ -354,6 +465,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 elements.cartSidebar.classList.remove('active'));
         }
 
+        // Оформление заказа
+        if (elements.checkoutBtn) {
+            elements.checkoutBtn.addEventListener('click', handleCheckout);
+        }
+
+        // Форма заказа
+        const orderForm = document.getElementById('checkout-form');
+        if (orderForm) {
+            orderForm.addEventListener('submit', handleOrderSubmit);
+        }
+
+        // Кнопка "Отмена"
+        if (elements.cancelBtn) {
+            elements.cancelBtn.addEventListener('click', handleCancelOrder);
+        }
+
         // Доставка
         if (elements.deliveryButton && elements.deliveryModal) {
             elements.deliveryButton.addEventListener('click', () => {
@@ -377,10 +504,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Акции
         if (elements.promoButton && elements.promoModal) {
-            elements.promoButton.addEventListener('click', () => {
-                elements.promoModal.style.display = 'flex';
-                loadPromotions();
-            });
+    elements.promoButton.addEventListener('click', () => {
+        elements.promoModal.style.display = 'flex';
+        loadPromotions(); // Загружаем акции при открытии модального окна
+    });
         }
         
         if (elements.closePromo && elements.promoModal) {
@@ -410,6 +537,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     elements.dishDetailsModal.style.display = 'none';
                 }
             });
+        }
+
+        // Успешное оформление заказа
+        if (elements.orderSuccessModal) {
+            elements.orderSuccessModal.addEventListener('click', (e) => {
+                if (e.target === elements.orderSuccessModal) {
+                    elements.orderSuccessModal.style.display = 'none';
+                }
+            });
+            
+            const closeSuccess = getElement('.close-success-modal', elements.orderSuccessModal);
+            if (closeSuccess) {
+                closeSuccess.addEventListener('click', () => {
+                    elements.orderSuccessModal.style.display = 'none';
+                });
+            }
         }
 
         // Глобальные обработчики
@@ -454,11 +597,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateCart();
             }
         });
-
-        // Оформление заказа
-        if (elements.checkoutBtn) {
-            elements.checkoutBtn.addEventListener('click', handleCheckout);
-        }
     };
 
     // Инициализация приложения
@@ -466,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initTelegramWebApp();
         setupEventListeners();
         updateCart();
+        initPhoneMask();
     };
 
     initApp();

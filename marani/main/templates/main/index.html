@@ -180,5 +180,54 @@
     </footer>
 
     <script src="{% static 'main/js/script.js' %}"></script>
+
+   <!-- Модальное окно оформления заказа -->
+<div id="checkout-modal" class="modal">
+    <div class="modal-content checkout-modal">
+        <span class="close-modal">&times;</span>
+        <h3>Оформление заказа</h3>
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="customer_name">Ваше имя *</label>
+                <input type="text" id="customer_name" name="customer_name" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Телефон *</label>
+                <input type="tel" id="phone" name="phone" class="form-input" placeholder="+7 (___) ___-__-__" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Адрес доставки *</label>
+                <textarea id="address" name="address" rows="3" class="form-input" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Способ оплаты *</label>
+                <div class="payment-options">
+                    <label>
+                        <input type="radio" name="payment_method" value="cash" checked>
+                        <span>Наличными</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="payment_method" value="card">
+                        <span>Картой</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="cancel-btn">Отмена</button>
+                <button type="submit" class="submit-btn">Готово</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Уведомление об успешном заказе -->
+<div id="order-success-modal" class="modal">
+    <div class="modal-content success-modal">
+        <div class="success-icon">✓</div>
+        <h3>Заказ успешно оформлен!</h3>
+        <p>Спасибо за ваш заказ! Наш менеджер свяжется с вами для подтверждения.</p>
+        <button class="close-success-modal">Закрыть</button>
+    </div>
+</div>
 </body>
 </html>
