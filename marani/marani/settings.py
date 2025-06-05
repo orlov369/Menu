@@ -19,7 +19,7 @@ EMAIL_HOST_USER = 'orlovt220905@gmail.com'  # Полный адрес Gmail
 EMAIL_HOST_PASSWORD = 'dpwk ddqa dcuw zmon'  # Пароль приложения (не пароль от аккаунта!)
 DEFAULT_FROM_EMAIL = 'maranimenu <orlovt220905@gmail.com>'
 
-ALLOWED_HOSTS = ['maranirestoran.ru', 'localhost', '127.0.0.1', '141.8.193.104']
+ALLOWED_HOSTS = ['*']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -31,9 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
-    'main',
     'rest_framework',  
-    
 ]
 
 MIDDLEWARE = [
