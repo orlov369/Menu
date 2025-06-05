@@ -65,13 +65,12 @@ WSGI_APPLICATION = 'marani.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'OPTIONS': {
-            'timeout': 20,
-            # Отключаем проверку deterministic
-            'isolation_level': None,
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'a1128841_123',
+        'USER': 'a1128841_123',
+        'PASSWORD': 'POEPapF3',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
