@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'ваш-секретный-ключ'  # Замените на реальный ключ
 
-DEBUG = False
+DEBUG = True
 
 if not DEBUG:
     raise Exception("Фейковая оплата запрещена в production!")
