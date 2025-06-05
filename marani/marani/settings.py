@@ -21,6 +21,8 @@ DEFAULT_FROM_EMAIL = 'maranimenu <orlovt220905@gmail.com>'
 
 ALLOWED_HOSTS = ['maranirestoran.ru', 'www.maranirestoran.ru']
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
+    'main',
     'rest_framework',  
     
 ]

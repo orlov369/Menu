@@ -13,6 +13,10 @@ import uuid
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Promotion
+from django.shortcuts import render
+
+def home_view(request):
+    return render(request, 'main/index.html')  # Убедитесь что шаблон существует
 
 def validate_telegram_data(request):
     init_data = request.headers.get('X-Telegram-Init-Data', '')
