@@ -19,7 +19,7 @@ EMAIL_HOST_USER = 'orlovt220905@gmail.com'  # Полный адрес Gmail
 EMAIL_HOST_PASSWORD = 'dpwk ddqa dcuw zmon'  # Пароль приложения (не пароль от аккаунта!)
 DEFAULT_FROM_EMAIL = 'maranimenu <orlovt220905@gmail.com>'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['maranirestoran.ru', 'www.maranirestoran.ru']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -67,6 +67,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 20,
+            # Отключаем проверку deterministic
+            'isolation_level': None,
+        }
     }
 }
 
