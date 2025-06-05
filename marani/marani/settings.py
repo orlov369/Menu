@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'ваш-секретный-ключ'  # Замените на реальный ключ
 
-DEBUG = True
+DEBUG = False
 
 if not DEBUG:
     raise Exception("Фейковая оплата запрещена в production!")
@@ -19,7 +19,7 @@ EMAIL_HOST_USER = 'orlovt220905@gmail.com'  # Полный адрес Gmail
 EMAIL_HOST_PASSWORD = 'dpwk ddqa dcuw zmon'  # Пароль приложения (не пароль от аккаунта!)
 DEFAULT_FROM_EMAIL = 'maranimenu <orlovt220905@gmail.com>'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['maranirestoran.ru', 'localhost', '127.0.0.1', '141.8.193.104']
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
