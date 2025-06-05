@@ -14,7 +14,7 @@ if not DEBUG:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Для TLS
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = False
 EMAIL_HOST_USER = 'orlovt220905@gmail.com'  # Полный адрес Gmail
 EMAIL_HOST_PASSWORD = 'dpwk ddqa dcuw zmon'  # Пароль приложения (не пароль от аккаунта!)
 DEFAULT_FROM_EMAIL = 'maranimenu <orlovt220905@gmail.com>'
